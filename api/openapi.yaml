@@ -6,8 +6,8 @@ info:
 servers:
   - url: http://localhost:8080
     description: Local
-  - url: https://tarea2sd.netlify.app
-    description: Remoto (Netlify)
+  - url: https://t2sistemasdist.onrender.com
+    description: Remoto (Render)
     variables:
       your-host:
         default: biblioteca-api
