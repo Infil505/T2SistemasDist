@@ -6,8 +6,8 @@ info:
 servers:
   - url: http://localhost:8080
     description: Local
-  - url: https://{your-host}.railway.app
-    description: Remoto (Railway/Render)
+  - url: https://tarea2sd.netlify.app
+    description: Remoto (Netlify)
     variables:
       your-host:
         default: biblioteca-api
