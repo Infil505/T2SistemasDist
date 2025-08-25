@@ -1,23 +1,36 @@
 openapi: "3.0.0"
 info:
   title: Library API
-  description: CRUD de libros, autores y editoriales (API-first con OpenAPI + oas-tools)
+  description: |
+    CRUD de libros, autores y editoriales (API-first con OpenAPI + oas-tools)
+    
+    ## Características
+    - Gestión completa de libros, autores y editoriales
+    - Filtros por diferentes criterios
+    - Validación de datos con esquemas OpenAPI
+    
   version: "1.0.0"
+  contact:
+    name: API Support
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
 servers:
   - url: http://localhost:8080
-    description: Local
+    description: Servidor Local de Desarrollo
   - url: https://t2sistemasdist.onrender.com
-    description: Remoto (Render)
-    variables:
-      your-host:
-        default: biblioteca-api
+    description: Servidor Remoto (Render)
+
 tags:
+  - name: meta
+    description: Información general de la API
   - name: books
-    description: Operaciones de libros
+    description: Operaciones CRUD de libros
   - name: authors
-    description: Operaciones de autores
+    description: Operaciones CRUD de autores
   - name: publishers
-    description: Operaciones de editoriales
+    description: Operaciones CRUD de editoriales
 
 paths:
   /:
@@ -27,20 +40,24 @@ paths:
       x-swagger-router-controller: root
       operationId: home
       summary: Estado de la API
+      description: Endpoint para verificar el estado de la API y obtener información básica
       responses:
         "200":
-          description: OK
+          description: API funcionando correctamente
           content:
             application/json:
               schema:
                 type: object
                 properties:
                   message:
-                    {
-                      type: string,
-                      example: "Library API funcionando correctamente",
-                    }
-                  version: { type: string, example: "1.0.0" }
+                    type: string
+                    example: "Library API funcionando correctamente"
+                  version:
+                    type: string
+                    example: "1.0.0"
+                required:
+                  - message
+                  - version
 
   /books:
     get:
@@ -48,35 +65,42 @@ paths:
       x-router-controller: books
       x-swagger-router-controller: books
       operationId: listBooks
-      summary: Lista todos los libros
+      summary: Listar todos los libros
+      description: |
+        Obtiene una lista de todos los libros disponibles en la biblioteca.
+        Se pueden aplicar filtros opcionales por autor, editorial o idioma.
       parameters:
         - name: author
           in: query
-          description: Filtrar por autor
+          description: Filtrar libros por nombre de autor
           required: false
           schema:
             type: string
+          example: "Robert C. Martin"
         - name: publisher
           in: query
-          description: Filtrar por editorial
+          description: Filtrar libros por editorial
           required: false
           schema:
             type: string
+          example: "Prentice Hall"
         - name: language
           in: query
-          description: Filtrar por idioma
+          description: Filtrar libros por idioma
           required: false
           schema:
             type: string
-            enum: [SPANISH, ENGLISH, FRENCH, GERMAN]
+            enum: [SPANISH, ENGLISH, FRENCH, GERMAN, ITALIAN, PORTUGUESE]
+          example: "ENGLISH"
       responses:
         "200":
-          description: Lista de libros
+          description: Lista de libros obtenida exitosamente
           content:
             application/json:
               schema:
                 type: array
-                items: { $ref: "#/components/schemas/Book" }
+                items:
+                  $ref: "#/components/schemas/Book"
               examples:
                 libros_variados:
                   summary: "Ejemplo de lista de libros"
@@ -102,28 +126,25 @@ paths:
                       category: "LITERATURE"
                       authorId: "a2"
                       publisherId: "p2"
-                    - id: "3"
-                      title: "The Pragmatic Programmer"
-                      subtitle: "From Journeyman to Master"
-                      isbn: "978-0201616224"
-                      edition: "1st"
-                      copyright: 1999
-                      language: "ENGLISH"
-                      pages: 352
-                      category: "PROGRAMMING"
-                      authorId: "a3"
-                      publisherId: "p3"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
     post:
       tags: [books]
       x-router-controller: books
       x-swagger-router-controller: books
       operationId: createBook
-      summary: Crea un libro
+      summary: Crear un nuevo libro
+      description: Crea un nuevo libro en la biblioteca con la información proporcionada
       requestBody:
         required: true
+        description: Datos del libro a crear
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/BookInput" }
+            schema:
+              $ref: "#/components/schemas/BookInput"
             examples:
               libro_programacion:
                 summary: "Libro de programación"
@@ -138,56 +159,103 @@ paths:
                   category: "PROGRAMMING"
                   authorId: "a4"
                   publisherId: "p4"
+              libro_literatura:
+                summary: "Libro de literatura"
+                value:
+                  title: "Cien años de soledad"
+                  isbn: "978-8437604947"
+                  edition: "Primera"
+                  copyright: 1967
+                  language: "SPANISH"
+                  pages: 471
+                  category: "LITERATURE"
+                  authorId: "a5"
+                  publisherId: "p5"
       responses:
         "201":
-          description: Creado
+          description: Libro creado exitosamente
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Book" }
+              schema:
+                $ref: "#/components/schemas/Book"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /books/{id}:
     parameters:
       - name: id
         in: path
         required: true
-        schema: { type: string }
+        description: Identificador único del libro
+        schema:
+          type: string
         example: "1"
+
     get:
       tags: [books]
       x-router-controller: books
       x-swagger-router-controller: books
       operationId: getBook
-      summary: Obtiene un libro por id
+      summary: Obtener libro por ID
+      description: Obtiene la información detallada de un libro específico
       responses:
         "200":
-          description: OK
+          description: Información del libro
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Book" }
-        "404": { description: No encontrado }
+              schema:
+                $ref: "#/components/schemas/Book"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
     put:
       tags: [books]
       x-router-controller: books
       x-swagger-router-controller: books
       operationId: updateBook
-      summary: Actualiza un libro
+      summary: Actualizar libro
+      description: Actualiza toda la información de un libro existente
       requestBody:
         required: true
+        description: Nueva información del libro
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/BookInput" }
+            schema:
+              $ref: "#/components/schemas/BookInput"
       responses:
-        "200": { description: OK }
-        "404": { description: No encontrado }
+        "200":
+          description: Libro actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
     delete:
       tags: [books]
       x-router-controller: books
       x-swagger-router-controller: books
       operationId: deleteBook
-      summary: Elimina un libro
+      summary: Eliminar libro
+      description: Elimina un libro de la biblioteca
       responses:
-        "204": { description: Borrado }
-        "404": { description: No encontrado }
+        "204":
+          description: Libro eliminado exitosamente
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /authors:
     get:
@@ -195,22 +263,25 @@ paths:
       x-router-controller: authors
       x-swagger-router-controller: authors
       operationId: listAuthors
-      summary: Lista autores
+      summary: Listar todos los autores
+      description: Obtiene una lista de todos los autores registrados, con filtro opcional por país
       parameters:
         - name: country
           in: query
-          description: Filtrar por país
+          description: Filtrar autores por país (código ISO de 2 letras)
           required: false
           schema:
             type: string
+          example: "US"
       responses:
         "200":
-          description: OK
+          description: Lista de autores obtenida exitosamente
           content:
             application/json:
               schema:
                 type: array
-                items: { $ref: "#/components/schemas/Author" }
+                items:
+                  $ref: "#/components/schemas/Author"
               examples:
                 autores_variados:
                   summary: "Ejemplo de lista de autores"
@@ -221,7 +292,7 @@ paths:
                       birthYear: 1952
                       nationality: "American"
                       country: "US"
-                      genre: "Technical Writing"
+                      genre: "TECHNICAL_WRITING"
                     - id: "a2"
                       name: "Miguel de Cervantes"
                       biography: "Novelista, poeta y dramaturgo español del Siglo de Oro"
@@ -229,75 +300,127 @@ paths:
                       deathYear: 1616
                       nationality: "Spanish"
                       country: "ES"
-                      genre: "Literature"
-                    - id: "a3"
-                      name: "Andy Hunt"
-                      biography: "Programador y autor, co-fundador del movimiento Agile"
-                      birthYear: 1964
-                      nationality: "American"
-                      country: "US"
-                      genre: "Technical Writing"
+                      genre: "LITERATURE"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
     post:
       tags: [authors]
       x-router-controller: authors
       x-swagger-router-controller: authors
       operationId: createAuthor
-      summary: Crea autor
+      summary: Crear nuevo autor
+      description: Registra un nuevo autor en el sistema
       requestBody:
         required: true
+        description: Datos del autor a crear
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/AuthorInput" }
+            schema:
+              $ref: "#/components/schemas/AuthorInput"
+            examples:
+              autor_contemporaneo:
+                summary: "Autor contemporáneo"
+                value:
+                  name: "Kent Beck"
+                  biography: "Pionero de metodologías ágiles y Test-Driven Development"
+                  birthYear: 1961
+                  nationality: "American"
+                  country: "US"
+                  genre: "TECHNICAL_WRITING"
       responses:
         "201":
-          description: Creado
+          description: Autor creado exitosamente
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Author" }
+              schema:
+                $ref: "#/components/schemas/Author"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /authors/{id}:
     parameters:
       - name: id
         in: path
         required: true
-        schema: { type: string }
+        description: Identificador único del autor
+        schema:
+          type: string
         example: "a1"
+
     get:
       tags: [authors]
       x-router-controller: authors
       x-swagger-router-controller: authors
       operationId: getAuthor
-      summary: Obtiene autor
+      summary: Obtener autor por ID
+      description: Obtiene la información detallada de un autor específico
       responses:
         "200":
-          description: OK
+          description: Información del autor
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Author" }
-        "404": { description: No encontrado }
+              schema:
+                $ref: "#/components/schemas/Author"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
     put:
       tags: [authors]
       x-router-controller: authors
       x-swagger-router-controller: authors
       operationId: updateAuthor
-      summary: Actualiza autor
+      summary: Actualizar autor
+      description: Actualiza la información de un autor existente
       requestBody:
         required: true
+        description: Nueva información del autor
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/AuthorInput" }
+            schema:
+              $ref: "#/components/schemas/AuthorInput"
       responses:
-        "200": { description: OK }
-        "404": { description: No encontrado }
+        "200":
+          description: Autor actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Author"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
     delete:
       tags: [authors]
       x-router-controller: authors
       x-swagger-router-controller: authors
       operationId: deleteAuthor
-      summary: Elimina autor
+      summary: Eliminar autor
+      description: Elimina un autor del sistema
       responses:
-        "204": { description: Borrado }
-        "404": { description: No encontrado }
+        "204":
+          description: Autor eliminado exitosamente
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: No se puede eliminar - el autor tiene libros asociados
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /publishers:
     get:
@@ -305,22 +428,25 @@ paths:
       x-router-controller: publishers
       x-swagger-router-controller: publishers
       operationId: listPublishers
-      summary: Lista editoriales
+      summary: Listar todas las editoriales
+      description: Obtiene una lista de todas las editoriales registradas
       parameters:
         - name: country
           in: query
-          description: Filtrar por país
+          description: Filtrar editoriales por país (código ISO de 2 letras)
           required: false
           schema:
             type: string
+          example: "US"
       responses:
         "200":
-          description: OK
+          description: Lista de editoriales obtenida exitosamente
           content:
             application/json:
               schema:
                 type: array
-                items: { $ref: "#/components/schemas/Publisher" }
+                items:
+                  $ref: "#/components/schemas/Publisher"
               examples:
                 editoriales_variadas:
                   summary: "Ejemplo de lista de editoriales"
@@ -339,74 +465,126 @@ paths:
                       country: "ES"
                       headquarters: "Madrid, España"
                       website: "https://www.catedra.com"
-                    - id: "p3"
-                      name: "Addison-Wesley"
-                      description: "Editorial de libros técnicos y académicos"
-                      foundedYear: 1942
-                      country: "US"
-                      headquarters: "Boston, MA"
-                      website: "https://www.pearson.com/aw"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
     post:
       tags: [publishers]
       x-router-controller: publishers
       x-swagger-router-controller: publishers
       operationId: createPublisher
-      summary: Crea editorial
+      summary: Crear nueva editorial
+      description: Registra una nueva editorial en el sistema
       requestBody:
         required: true
+        description: Datos de la editorial a crear
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/PublisherInput" }
+            schema:
+              $ref: "#/components/schemas/PublisherInput"
+            examples:
+              editorial_nueva:
+                summary: "Nueva editorial"
+                value:
+                  name: "O'Reilly Media"
+                  description: "Editorial especializada en tecnología y programación"
+                  foundedYear: 1978
+                  country: "US"
+                  headquarters: "Sebastopol, CA"
+                  website: "https://www.oreilly.com"
       responses:
         "201":
-          description: Creado
+          description: Editorial creada exitosamente
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Publisher" }
+              schema:
+                $ref: "#/components/schemas/Publisher"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /publishers/{id}:
     parameters:
       - name: id
         in: path
         required: true
-        schema: { type: string }
+        description: Identificador único de la editorial
+        schema:
+          type: string
         example: "p1"
+
     get:
       tags: [publishers]
       x-router-controller: publishers
       x-swagger-router-controller: publishers
       operationId: getPublisher
-      summary: Obtiene editorial
+      summary: Obtener editorial por ID
+      description: Obtiene la información detallada de una editorial específica
       responses:
         "200":
-          description: OK
+          description: Información de la editorial
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Publisher" }
-        "404": { description: No encontrado }
+              schema:
+                $ref: "#/components/schemas/Publisher"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
     put:
       tags: [publishers]
       x-router-controller: publishers
       x-swagger-router-controller: publishers
       operationId: updatePublisher
-      summary: Actualiza editorial
+      summary: Actualizar editorial
+      description: Actualiza la información de una editorial existente
       requestBody:
         required: true
+        description: Nueva información de la editorial
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/PublisherInput" }
+            schema:
+              $ref: "#/components/schemas/PublisherInput"
       responses:
-        "200": { description: OK }
-        "404": { description: No encontrado }
+        "200":
+          description: Editorial actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Publisher"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
     delete:
       tags: [publishers]
       x-router-controller: publishers
       x-swagger-router-controller: publishers
       operationId: deletePublisher
-      summary: Elimina editorial
+      summary: Eliminar editorial
+      description: Elimina una editorial del sistema
       responses:
-        "204": { description: Borrado }
-        "404": { description: No encontrado }
+        "204":
+          description: Editorial eliminada exitosamente
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: No se puede eliminar - la editorial tiene libros asociados
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
 components:
   schemas:
@@ -414,45 +592,59 @@ components:
       type: object
       required: [title, authorId, publisherId]
       properties:
-        title: { type: string, example: "Clean Code" }
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          example: "Clean Code"
+          description: "Título del libro"
         subtitle:
-          {
-            type: string,
-            example: "A Handbook of Agile Software Craftsmanship",
-          }
+          type: string
+          maxLength: 200
+          example: "A Handbook of Agile Software Craftsmanship"
+          description: "Subtítulo del libro (opcional)"
         isbn:
-          {
-            type: string,
-            pattern: "^[0-9]{3}-[0-9]{10}$",
-            example: "978-0132350884",
-          }
-        edition: { type: string, example: "1st" }
+          type: string
+          pattern: "^978-[0-9]{10}$"
+          example: "978-0132350884"
+          description: "ISBN-13 del libro en formato 978-XXXXXXXXXX"
+        edition:
+          type: string
+          maxLength: 50
+          example: "1st"
+          description: "Edición del libro"
         copyright:
-          { type: integer, minimum: 1000, maximum: 2030, example: 2008 }
+          type: integer
+          minimum: 1000
+          maximum: 2030
+          example: 2008
+          description: "Año de copyright"
         language:
-          {
-            type: string,
-            enum: [SPANISH, ENGLISH, FRENCH, GERMAN, ITALIAN, PORTUGUESE],
-            example: "ENGLISH",
-          }
-        pages: { type: integer, minimum: 1, example: 464 }
+          type: string
+          enum: [SPANISH, ENGLISH, FRENCH, GERMAN, ITALIAN, PORTUGUESE]
+          example: "ENGLISH"
+          description: "Idioma del libro"
+        pages:
+          type: integer
+          minimum: 1
+          maximum: 10000
+          example: 464
+          description: "Número de páginas"
         category:
-          {
-            type: string,
-            enum:
-              [
-                PROGRAMMING,
-                LITERATURE,
-                SCIENCE,
-                HISTORY,
-                BIOGRAPHY,
-                REFERENCE,
-                FICTION,
-              ],
-            example: "PROGRAMMING",
-          }
-        authorId: { type: string, example: "a1" }
-        publisherId: { type: string, example: "p1" }
+          type: string
+          enum: [PROGRAMMING, LITERATURE, SCIENCE, HISTORY, BIOGRAPHY, REFERENCE, FICTION]
+          example: "PROGRAMMING"
+          description: "Categoría del libro"
+        authorId:
+          type: string
+          minLength: 1
+          example: "a1"
+          description: "ID del autor del libro"
+        publisherId:
+          type: string
+          minLength: 1
+          example: "p1"
+          description: "ID de la editorial del libro"
 
     Book:
       allOf:
@@ -460,38 +652,55 @@ components:
         - type: object
           required: [id]
           properties:
-            id: { type: string, example: "1" }
+            id:
+              type: string
+              example: "1"
+              description: "Identificador único del libro"
 
     AuthorInput:
       type: object
       required: [name]
       properties:
-        name: { type: string, example: "Robert C. Martin" }
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "Robert C. Martin"
+          description: "Nombre completo del autor"
         biography:
-          {
-            type: string,
-            example: "Ingeniero de software y consultor, conocido como Uncle Bob",
-          }
+          type: string
+          maxLength: 1000
+          example: "Ingeniero de software y consultor, conocido como Uncle Bob"
+          description: "Biografía del autor"
         birthYear:
-          { type: integer, minimum: 1000, maximum: 2010, example: 1952 }
+          type: integer
+          minimum: 1000
+          maximum: 2010
+          example: 1952
+          description: "Año de nacimiento"
         deathYear:
-          { type: integer, minimum: 1000, maximum: 2030, example: null }
-        nationality: { type: string, example: "American" }
-        country: { type: string, example: "US" }
+          type: integer
+          minimum: 1000
+          maximum: 2030
+          nullable: true
+          example: null
+          description: "Año de fallecimiento (null si está vivo)"
+        nationality:
+          type: string
+          maxLength: 50
+          example: "American"
+          description: "Nacionalidad del autor"
+        country:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: "US"
+          description: "Código ISO de 2 letras del país"
         genre:
-          {
-            type: string,
-            enum:
-              [
-                LITERATURE,
-                TECHNICAL_WRITING,
-                SCIENCE,
-                HISTORY,
-                BIOGRAPHY,
-                FICTION,
-              ],
-            example: "TECHNICAL_WRITING",
-          }
+          type: string
+          enum: [LITERATURE, TECHNICAL_WRITING, SCIENCE, HISTORY, BIOGRAPHY, FICTION]
+          example: "TECHNICAL_WRITING"
+          description: "Género principal del autor"
 
     Author:
       allOf:
@@ -499,20 +708,49 @@ components:
         - type: object
           required: [id]
           properties:
-            id: { type: string, example: "a1" }
+            id:
+              type: string
+              example: "a1"
+              description: "Identificador único del autor"
 
     PublisherInput:
       type: object
       required: [name, country]
       properties:
-        name: { type: string, example: "Prentice Hall" }
-        description: { type: string, example: "Editorial técnica y educativa" }
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "Prentice Hall"
+          description: "Nombre de la editorial"
+        description:
+          type: string
+          maxLength: 500
+          example: "Editorial técnica y educativa"
+          description: "Descripción de la editorial"
         foundedYear:
-          { type: integer, minimum: 1400, maximum: 2030, example: 1913 }
-        country: { type: string, example: "US" }
-        headquarters: { type: string, example: "Boston, MA" }
+          type: integer
+          minimum: 1400
+          maximum: 2030
+          example: 1913
+          description: "Año de fundación"
+        country:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: "US"
+          description: "Código ISO de 2 letras del país"
+        headquarters:
+          type: string
+          maxLength: 200
+          example: "Boston, MA"
+          description: "Ubicación de la sede principal"
         website:
-          { type: string, format: uri, example: "https://www.pearson.com" }
+          type: string
+          format: uri
+          maxLength: 200
+          example: "https://www.pearson.com"
+          description: "Sitio web oficial"
 
     Publisher:
       allOf:
@@ -520,4 +758,66 @@ components:
         - type: object
           required: [id]
           properties:
-            id: { type: string, example: "p1" }
+            id:
+              type: string
+              example: "p1"
+              description: "Identificador único de la editorial"
+
+    Error:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+          example: "BAD_REQUEST"
+          description: "Código de error"
+        message:
+          type: string
+          example: "Los datos proporcionados no son válidos"
+          description: "Mensaje descriptivo del error"
+        details:
+          type: string
+          example: "El campo 'title' es requerido"
+          description: "Detalles adicionales del error"
+
+  responses:
+    BadRequest:
+      description: Solicitud inválida - datos mal formados o faltantes
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "BAD_REQUEST"
+            message: "Los datos proporcionados no son válidos"
+            details: "El campo 'title' es requerido"
+
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "NOT_FOUND"
+            message: "El recurso solicitado no existe"
+
+    Conflict:
+      description: Conflicto - el recurso ya existe
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "CONFLICT"
+            message: "Ya existe un recurso con los mismos datos"
+
+    InternalServerError:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "INTERNAL_SERVER_ERROR"
+            message: "Ha ocurrido un error interno en el servidor"
