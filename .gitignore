@@ -1,0 +1,12 @@
+node_modules/
+.gradle/
+.gradle-cache/
+**/build/
+**/dist/
+**/.classpath
+**/.project
+**/.settings/
+*.log
+.env
+*.iml
+.idea/

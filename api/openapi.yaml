@@ -1,0 +1,523 @@
+openapi: "3.0.0"
+info:
+  title: Library API
+  description: CRUD de libros, autores y editoriales (API-first con OpenAPI + oas-tools)
+  version: "1.0.0"
+servers:
+  - url: http://localhost:8080
+    description: Local
+  - url: https://{your-host}.railway.app
+    description: Remoto (Railway/Render)
+    variables:
+      your-host:
+        default: biblioteca-api
+tags:
+  - name: books
+    description: Operaciones de libros
+  - name: authors
+    description: Operaciones de autores
+  - name: publishers
+    description: Operaciones de editoriales
+
+paths:
+  /:
+    get:
+      tags: [meta]
+      x-router-controller: root
+      x-swagger-router-controller: root
+      operationId: home
+      summary: Estado de la API
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    {
+                      type: string,
+                      example: "Library API funcionando correctamente",
+                    }
+                  version: { type: string, example: "1.0.0" }
+
+  /books:
+    get:
+      tags: [books]
+      x-router-controller: books
+      x-swagger-router-controller: books
+      operationId: listBooks
+      summary: Lista todos los libros
+      parameters:
+        - name: author
+          in: query
+          description: Filtrar por autor
+          required: false
+          schema:
+            type: string
+        - name: publisher
+          in: query
+          description: Filtrar por editorial
+          required: false
+          schema:
+            type: string
+        - name: language
+          in: query
+          description: Filtrar por idioma
+          required: false
+          schema:
+            type: string
+            enum: [SPANISH, ENGLISH, FRENCH, GERMAN]
+      responses:
+        "200":
+          description: Lista de libros
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Book" }
+              examples:
+                libros_variados:
+                  summary: "Ejemplo de lista de libros"
+                  value:
+                    - id: "1"
+                      title: "Clean Code"
+                      subtitle: "A Handbook of Agile Software Craftsmanship"
+                      isbn: "978-0132350884"
+                      edition: "1st"
+                      copyright: 2008
+                      language: "ENGLISH"
+                      pages: 464
+                      category: "PROGRAMMING"
+                      authorId: "a1"
+                      publisherId: "p1"
+                    - id: "2"
+                      title: "Don Quijote de la Mancha"
+                      isbn: "978-8420412146"
+                      edition: "Edición completa"
+                      copyright: 1605
+                      language: "SPANISH"
+                      pages: 1376
+                      category: "LITERATURE"
+                      authorId: "a2"
+                      publisherId: "p2"
+                    - id: "3"
+                      title: "The Pragmatic Programmer"
+                      subtitle: "From Journeyman to Master"
+                      isbn: "978-0201616224"
+                      edition: "1st"
+                      copyright: 1999
+                      language: "ENGLISH"
+                      pages: 352
+                      category: "PROGRAMMING"
+                      authorId: "a3"
+                      publisherId: "p3"
+    post:
+      tags: [books]
+      x-router-controller: books
+      x-swagger-router-controller: books
+      operationId: createBook
+      summary: Crea un libro
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BookInput" }
+            examples:
+              libro_programacion:
+                summary: "Libro de programación"
+                value:
+                  title: "JavaScript: The Good Parts"
+                  subtitle: "The Good Parts"
+                  isbn: "978-0596517748"
+                  edition: "1st"
+                  copyright: 2008
+                  language: "ENGLISH"
+                  pages: 176
+                  category: "PROGRAMMING"
+                  authorId: "a4"
+                  publisherId: "p4"
+      responses:
+        "201":
+          description: Creado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Book" }
+
+  /books/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+        example: "1"
+    get:
+      tags: [books]
+      x-router-controller: books
+      x-swagger-router-controller: books
+      operationId: getBook
+      summary: Obtiene un libro por id
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Book" }
+        "404": { description: No encontrado }
+    put:
+      tags: [books]
+      x-router-controller: books
+      x-swagger-router-controller: books
+      operationId: updateBook
+      summary: Actualiza un libro
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BookInput" }
+      responses:
+        "200": { description: OK }
+        "404": { description: No encontrado }
+    delete:
+      tags: [books]
+      x-router-controller: books
+      x-swagger-router-controller: books
+      operationId: deleteBook
+      summary: Elimina un libro
+      responses:
+        "204": { description: Borrado }
+        "404": { description: No encontrado }
+
+  /authors:
+    get:
+      tags: [authors]
+      x-router-controller: authors
+      x-swagger-router-controller: authors
+      operationId: listAuthors
+      summary: Lista autores
+      parameters:
+        - name: country
+          in: query
+          description: Filtrar por país
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Author" }
+              examples:
+                autores_variados:
+                  summary: "Ejemplo de lista de autores"
+                  value:
+                    - id: "a1"
+                      name: "Robert C. Martin"
+                      biography: "Ingeniero de software y consultor, conocido como Uncle Bob"
+                      birthYear: 1952
+                      nationality: "American"
+                      country: "US"
+                      genre: "Technical Writing"
+                    - id: "a2"
+                      name: "Miguel de Cervantes"
+                      biography: "Novelista, poeta y dramaturgo español del Siglo de Oro"
+                      birthYear: 1547
+                      deathYear: 1616
+                      nationality: "Spanish"
+                      country: "ES"
+                      genre: "Literature"
+                    - id: "a3"
+                      name: "Andy Hunt"
+                      biography: "Programador y autor, co-fundador del movimiento Agile"
+                      birthYear: 1964
+                      nationality: "American"
+                      country: "US"
+                      genre: "Technical Writing"
+    post:
+      tags: [authors]
+      x-router-controller: authors
+      x-swagger-router-controller: authors
+      operationId: createAuthor
+      summary: Crea autor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AuthorInput" }
+      responses:
+        "201":
+          description: Creado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Author" }
+
+  /authors/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+        example: "a1"
+    get:
+      tags: [authors]
+      x-router-controller: authors
+      x-swagger-router-controller: authors
+      operationId: getAuthor
+      summary: Obtiene autor
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Author" }
+        "404": { description: No encontrado }
+    put:
+      tags: [authors]
+      x-router-controller: authors
+      x-swagger-router-controller: authors
+      operationId: updateAuthor
+      summary: Actualiza autor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AuthorInput" }
+      responses:
+        "200": { description: OK }
+        "404": { description: No encontrado }
+    delete:
+      tags: [authors]
+      x-router-controller: authors
+      x-swagger-router-controller: authors
+      operationId: deleteAuthor
+      summary: Elimina autor
+      responses:
+        "204": { description: Borrado }
+        "404": { description: No encontrado }
+
+  /publishers:
+    get:
+      tags: [publishers]
+      x-router-controller: publishers
+      x-swagger-router-controller: publishers
+      operationId: listPublishers
+      summary: Lista editoriales
+      parameters:
+        - name: country
+          in: query
+          description: Filtrar por país
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Publisher" }
+              examples:
+                editoriales_variadas:
+                  summary: "Ejemplo de lista de editoriales"
+                  value:
+                    - id: "p1"
+                      name: "Prentice Hall"
+                      description: "Editorial técnica y educativa"
+                      foundedYear: 1913
+                      country: "US"
+                      headquarters: "Boston, MA"
+                      website: "https://www.pearson.com"
+                    - id: "p2"
+                      name: "Editorial Cátedra"
+                      description: "Editorial española especializada en literatura"
+                      foundedYear: 1973
+                      country: "ES"
+                      headquarters: "Madrid, España"
+                      website: "https://www.catedra.com"
+                    - id: "p3"
+                      name: "Addison-Wesley"
+                      description: "Editorial de libros técnicos y académicos"
+                      foundedYear: 1942
+                      country: "US"
+                      headquarters: "Boston, MA"
+                      website: "https://www.pearson.com/aw"
+    post:
+      tags: [publishers]
+      x-router-controller: publishers
+      x-swagger-router-controller: publishers
+      operationId: createPublisher
+      summary: Crea editorial
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PublisherInput" }
+      responses:
+        "201":
+          description: Creado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Publisher" }
+
+  /publishers/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+        example: "p1"
+    get:
+      tags: [publishers]
+      x-router-controller: publishers
+      x-swagger-router-controller: publishers
+      operationId: getPublisher
+      summary: Obtiene editorial
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Publisher" }
+        "404": { description: No encontrado }
+    put:
+      tags: [publishers]
+      x-router-controller: publishers
+      x-swagger-router-controller: publishers
+      operationId: updatePublisher
+      summary: Actualiza editorial
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PublisherInput" }
+      responses:
+        "200": { description: OK }
+        "404": { description: No encontrado }
+    delete:
+      tags: [publishers]
+      x-router-controller: publishers
+      x-swagger-router-controller: publishers
+      operationId: deletePublisher
+      summary: Elimina editorial
+      responses:
+        "204": { description: Borrado }
+        "404": { description: No encontrado }
+
+components:
+  schemas:
+    BookInput:
+      type: object
+      required: [title, authorId, publisherId]
+      properties:
+        title: { type: string, example: "Clean Code" }
+        subtitle:
+          {
+            type: string,
+            example: "A Handbook of Agile Software Craftsmanship",
+          }
+        isbn:
+          {
+            type: string,
+            pattern: "^[0-9]{3}-[0-9]{10}$",
+            example: "978-0132350884",
+          }
+        edition: { type: string, example: "1st" }
+        copyright:
+          { type: integer, minimum: 1000, maximum: 2030, example: 2008 }
+        language:
+          {
+            type: string,
+            enum: [SPANISH, ENGLISH, FRENCH, GERMAN, ITALIAN, PORTUGUESE],
+            example: "ENGLISH",
+          }
+        pages: { type: integer, minimum: 1, example: 464 }
+        category:
+          {
+            type: string,
+            enum:
+              [
+                PROGRAMMING,
+                LITERATURE,
+                SCIENCE,
+                HISTORY,
+                BIOGRAPHY,
+                REFERENCE,
+                FICTION,
+              ],
+            example: "PROGRAMMING",
+          }
+        authorId: { type: string, example: "a1" }
+        publisherId: { type: string, example: "p1" }
+
+    Book:
+      allOf:
+        - $ref: "#/components/schemas/BookInput"
+        - type: object
+          required: [id]
+          properties:
+            id: { type: string, example: "1" }
+
+    AuthorInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, example: "Robert C. Martin" }
+        biography:
+          {
+            type: string,
+            example: "Ingeniero de software y consultor, conocido como Uncle Bob",
+          }
+        birthYear:
+          { type: integer, minimum: 1000, maximum: 2010, example: 1952 }
+        deathYear:
+          { type: integer, minimum: 1000, maximum: 2030, example: null }
+        nationality: { type: string, example: "American" }
+        country: { type: string, example: "US" }
+        genre:
+          {
+            type: string,
+            enum:
+              [
+                LITERATURE,
+                TECHNICAL_WRITING,
+                SCIENCE,
+                HISTORY,
+                BIOGRAPHY,
+                FICTION,
+              ],
+            example: "TECHNICAL_WRITING",
+          }
+
+    Author:
+      allOf:
+        - $ref: "#/components/schemas/AuthorInput"
+        - type: object
+          required: [id]
+          properties:
+            id: { type: string, example: "a1" }
+
+    PublisherInput:
+      type: object
+      required: [name, country]
+      properties:
+        name: { type: string, example: "Prentice Hall" }
+        description: { type: string, example: "Editorial técnica y educativa" }
+        foundedYear:
+          { type: integer, minimum: 1400, maximum: 2030, example: 1913 }
+        country: { type: string, example: "US" }
+        headquarters: { type: string, example: "Boston, MA" }
+        website:
+          { type: string, format: uri, example: "https://www.pearson.com" }
+
+    Publisher:
+      allOf:
+        - $ref: "#/components/schemas/PublisherInput"
+        - type: object
+          required: [id]
+          properties:
+            id: { type: string, example: "p1" }

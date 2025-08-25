@@ -1,0 +1,38 @@
+{
+  "books": [
+    {
+      "id": "1",
+      "title": "Operating System Concepts",
+      "edition": "9th",
+      "copyright": 2012,
+      "language": "ENGLISH",
+      "pages": 976,
+      "authorId": "a1",
+      "publisherId": "p1"
+    },
+    {
+      "id": "25",
+      "title": "Operating System Concepts 2",
+      "edition": "10th",
+      "copyright": 2015,
+      "language": "ENGLISH",
+      "pages": 976,
+      "authorId": "a1",
+      "publisherId": "p1"
+    }
+  ],
+  "authors": [
+    {
+      "id": "a1",
+      "name": "Abraham Silberschatz",
+      "country": "US"
+    }
+  ],
+  "publishers": [
+    {
+      "id": "p1",
+      "name": "John Wiley & Sons",
+      "country": "US"
+    }
+  ]
+}
