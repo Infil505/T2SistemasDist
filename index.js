@@ -5,44 +5,43 @@ const http = require('http');
 const express = require('express');
 const cors = require('cors');
 const oas3Tools = require('oas3-tools');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
 
 const serverPort = process.env.PORT || 8080;
 
-const options = {
-    routing: {
-        controllers: path.join(__dirname, './controllers'),
-    },
-};
+// 1) Carga tu OpenAPI
+const openapiPath = path.join(__dirname, 'api/openapi.yaml');
+const openapiDoc = YAML.load(openapiPath);
 
-// App generado por oas3-tools (con /docs incluido)
-const expressAppConfig = oas3Tools.expressAppConfig(
-    path.join(__dirname, 'api/openapi.yaml'),
-    options
-);
-const oasApp = expressAppConfig.getApp();
+// 2) App generado por oas3-tools (rutas de la API)
+const oasApp = oas3Tools
+    .expressAppConfig(openapiPath, {
+        routing: { controllers: path.join(__dirname, './controllers') },
+    })
+    .getApp();
 
-// App “padre” para controlar el orden
+// 3) App “padre” para controlar el orden
 const app = express();
-
-// (Opcional) CORS: quítalo si no lo ocupas
+app.set('trust proxy', 1);
 app.use(cors());
 
-// Por si estás detrás de proxy (Render/Heroku)
-app.set('trust proxy', 1);
+// 4) Redirección raíz → /docs (ANTES de montar nada más)
+app.get('/', (req, res) => res.redirect(302, '/docs'));
 
-// ➜ que / vaya al Swagger UI (siempre antes de montar oasApp)
-app.get('/', (req, res) => {
-    // 302 para no cachear permanentemente; usa 308 si quieres método inmutable
-    res.redirect(302, `${req.baseUrl || ''}/docs`);
-});
+// 5) Sirve Swagger UI en /docs (independiente de oas3-tools)
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiDoc, { explorer: true }));
 
-// Monta el app generado por oas3-tools (incluye /docs y las rutas de la API)
+// 6) Monta el app de oas3-tools (todas las rutas de la API)
 app.use(oasApp);
 
-// (Opcional) 404 JSON
-app.use((req, res) => res.status(404).json({ message: 'Not found' }));
+// 7) 404 final (por si algo se escapa)
+app.use((req, res) => {
+    res.status(404).json({ message: 'not found', errors: [{ path: req.path, message: 'not found' }] });
+});
 
+// 8) Arranque
 http.createServer(app).listen(serverPort, () => {
     console.log(`Server listening on http://localhost:${serverPort}`);
-    console.log(`Swagger-UI: http://localhost:${serverPort}/docs`);
+    console.log(`Swagger UI: http://localhost:${serverPort}/docs`);
 });
