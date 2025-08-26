@@ -1,10 +1,65 @@
 'use strict';
 const { read, write } = require('../db');
 
+// Función helper para normalizar idiomas (igual que en db.js)
+const normalizeLanguageEnum = (val) => {
+    if (val == null) return undefined;
+    const n = String(val).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    if (['spanish', 'es', 'espanol'].includes(n)) return 'SPANISH';
+    if (['english', 'en', 'ingles'].includes(n)) return 'ENGLISH';
+    if (['french', 'fr', 'frances'].includes(n)) return 'FRENCH';
+    if (['german', 'de', 'aleman'].includes(n)) return 'GERMAN';
+    if (['italian', 'it', 'italiano'].includes(n)) return 'ITALIAN';
+    if (['portuguese', 'pt', 'portugues'].includes(n)) return 'PORTUGUESE';
+    // Si viene ya como enum u otro valor, lo dejamos en MAYÚSCULAS
+    return String(val).toUpperCase();
+};
+
 // GET /books
 module.exports.listBooks = (req, res) => {
     const db = read();
-    res.json(db.books);
+
+    // Llega tal cual del enum de Swagger (p. ej., "ENGLISH", "SPANISH")
+    const selected = req.query.language;
+    let results = db.books;
+
+    // DEBUG: Agregar logs para ver qué está pasando
+    console.log('=== DEBUG LANGUAGE FILTER ===');
+    console.log('Selected language:', selected);
+    console.log('Total books:', db.books.length);
+    
+    // Mostrar los idiomas de todos los libros
+    db.books.forEach(book => {
+        const raw = book.language ?? book.lang ?? book.idioma;
+        const normalized = normalizeLanguageEnum(raw);
+        console.log(`Book "${book.title}": raw="${raw}", normalized="${normalized}"`);
+    });
+
+    if (selected && selected !== '--') {
+        // Normalizar el idioma seleccionado
+        const normalizedSelected = normalizeLanguageEnum(selected);
+        console.log('Normalized selected:', normalizedSelected);
+        
+        results = results.filter((b) => {
+            const raw = b.language ?? b.lang ?? b.idioma;
+            const values = Array.isArray(raw) ? raw : [raw];
+            
+            const match = values.some((v) => {
+                const normalizedValue = normalizeLanguageEnum(v);
+                const isMatch = normalizedValue === normalizedSelected;
+                console.log(`  Checking "${b.title}": "${normalizedValue}" === "${normalizedSelected}" = ${isMatch}`);
+                return isMatch;
+            });
+            
+            return match;
+        });
+        
+        console.log('Filtered results:', results.length);
+    }
+    
+    console.log('=== END DEBUG ===');
+
+    res.json(results);
 };
 
 // POST /books

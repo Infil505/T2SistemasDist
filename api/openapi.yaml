@@ -33,7 +33,7 @@ tags:
     description: Operaciones CRUD de editoriales
 
 paths:
-  /:
+  /estatus:
     get:
       tags: [meta]
       x-router-controller: root
@@ -70,20 +70,6 @@ paths:
         Obtiene una lista de todos los libros disponibles en la biblioteca.
         Se pueden aplicar filtros opcionales por autor, editorial o idioma.
       parameters:
-        - name: author
-          in: query
-          description: Filtrar libros por nombre de autor
-          required: false
-          schema:
-            type: string
-          example: "Robert C. Martin"
-        - name: publisher
-          in: query
-          description: Filtrar libros por editorial
-          required: false
-          schema:
-            type: string
-          example: "Prentice Hall"
         - name: language
           in: query
           description: Filtrar libros por idioma
@@ -91,7 +77,6 @@ paths:
           schema:
             type: string
             enum: [SPANISH, ENGLISH, FRENCH, GERMAN, ITALIAN, PORTUGUESE]
-          example: "ENGLISH"
       responses:
         "200":
           description: Lista de libros obtenida exitosamente
@@ -117,6 +102,16 @@ paths:
                       authorId: "a1"
                       publisherId: "p1"
                     - id: "2"
+                      title: "Don Quijote de la Mancha"
+                      isbn: "978-8420412146"
+                      edition: "Edición completa"
+                      copyright: 1605
+                      language: "SPANISH"
+                      pages: 1376
+                      category: "LITERATURE"
+                      authorId: "a2"
+                      publisherId: "p2"
+                    - id: "3"
                       title: "Don Quijote de la Mancha"
                       isbn: "978-8420412146"
                       edition: "Edición completa"
