@@ -85,7 +85,11 @@ module.exports.createBook = (req, res) => {
 // GET /books/{id}
 module.exports.getBook = (req, res) => {
     const db = read();
-    const book = db.books.find(b => b.id === req.params.id);
+    const rawId =
+        req.params?.id ??
+        req.openapi?.pathParams?.id ??
+        req.query?.id;
+    const book = db.books.find(b => b.id === rawId);
     if (!book) return res.sendStatus(404);
     res.json(book);
 };
@@ -111,10 +115,11 @@ module.exports.updateBook = (req, res) => {
 
 // DELETE /books/{id}
 module.exports.deleteBook = (req, res) => {
+    const rawId = req.params?.id ?? req.openapi?.pathParams?.id ?? req.query?.id;
     const db = read();
-    const exists = db.books.some(b => b.id === req.params.id);
+    const exists = db.books.some(b => b.id === rawId);
     if (!exists) return res.sendStatus(404);
-    db.books = db.books.filter(b => b.id !== req.params.id);
+    db.books = db.books.filter(b => b.id !== rawId);
     write(db);
     res.sendStatus(204);
 };

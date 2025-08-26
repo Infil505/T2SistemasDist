@@ -36,13 +36,14 @@ module.exports.updatePublisher = (req, res) => {
 
 module.exports.deletePublisher = (req, res) => {
     const db = read();
-    const exists = db.publishers.some(p => p.id === req.params.id);
+    const rawId = req.params?.id ?? req.openapi?.pathParams?.id ?? req.query?.id;
+    const exists = db.publishers.some(p => p.id === rawId);
     if (!exists) return res.sendStatus(404);
 
-    const hasBooks = read().books.some(b => b.publisherId === req.params.id);
+    const hasBooks = read().books.some(b => b.publisherId === rawId);
     if (hasBooks) return res.status(409).json({ message: 'editorial con libros asociados' });
 
-    db.publishers = db.publishers.filter(p => p.id !== req.params.id);
+    db.publishers = db.publishers.filter(p => p.id !== rawId);
     write(db);
     res.sendStatus(204);
 };

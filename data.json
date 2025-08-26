@@ -1,37 +1,278 @@
 {
   "books": [
-    { "id": "1",  "title": "Operating System Concepts", "edition": "9th", "copyright": 2012, "language": "ENGLISH",    "pages": 976,  "category": "SCIENCE",    "authorId": "a1", "publisherId": "p1" },
-    { "id": "2",  "title": "Modern Operating Systems",   "edition": "4th", "copyright": 2014, "language": "ENGLISH",    "pages": 1136, "category": "SCIENCE",    "authorId": "a2", "publisherId": "p2" },
-    { "id": "3",  "title": "Cien años de soledad",                       "copyright": 1967, "language": "SPANISH",    "pages": 471,  "category": "LITERATURE","authorId": "a3", "publisherId": "p3" },
-    { "id": "4",  "title": "Pride and Prejudice",                        "copyright": 1813, "language": "ENGLISH",    "pages": 432,  "category": "LITERATURE","authorId": "a4", "publisherId": "p4" },
-    { "id": "5",  "title": "Le Petit Prince",                            "copyright": 1943, "language": "FRENCH",     "pages": 96,   "category": "LITERATURE","authorId": "a5", "publisherId": "p5" },
-    { "id": "6",  "title": "Die Verwandlung",                            "copyright": 1915, "language": "GERMAN",     "pages": 201,  "category": "LITERATURE","authorId": "a6", "publisherId": "p6" },
-    { "id": "7",  "title": "Il nome della rosa",                         "copyright": 1980, "language": "ITALIAN",    "pages": 552,  "category": "LITERATURE","authorId": "a7", "publisherId": "p7" },
-    { "id": "8",  "title": "Os Lusíadas",                                "copyright": 1572, "language": "PORTUGUESE", "pages": 881,  "category": "LITERATURE","authorId": "a8", "publisherId": "p8" },
-    { "id": "9",  "title": "Love and Friendship",                        "copyright": 1790, "language": "ENGLISH",    "pages": 128,  "category": "LITERATURE","authorId": "a4", "publisherId": "p4" },
-    { "id": "10", "title": "Crónica de una muerte anunciada",            "copyright": 1981, "language": "SPANISH",    "pages": 128,  "category": "LITERATURE","authorId": "a3", "publisherId": "p3" },
-    { "id": "11", "title": "Sapiens: A Brief History of Humankind",      "copyright": 2011, "language": "ENGLISH",    "pages": 498,  "category": "HISTORY",  "authorId": "a9", "publisherId": "p9" }
+    {
+      "id": "1",
+      "title": "Operating System Concepts",
+      "edition": "9th",
+      "copyright": 2012,
+      "language": "ENGLISH",
+      "pages": 976,
+      "category": "SCIENCE",
+      "authorId": "a1",
+      "publisherId": "p1"
+    },
+    {
+      "id": "3",
+      "title": "Cien años de soledad",
+      "copyright": 1967,
+      "language": "SPANISH",
+      "pages": 471,
+      "category": "LITERATURE",
+      "authorId": "a3",
+      "publisherId": "p3"
+    },
+    {
+      "id": "4",
+      "title": "Pride and Prejudice",
+      "copyright": 1813,
+      "language": "ENGLISH",
+      "pages": 432,
+      "category": "LITERATURE",
+      "authorId": "a4",
+      "publisherId": "p4"
+    },
+    {
+      "id": "5",
+      "title": "Le Petit Prince",
+      "copyright": 1943,
+      "language": "FRENCH",
+      "pages": 96,
+      "category": "LITERATURE",
+      "authorId": "a5",
+      "publisherId": "p5"
+    },
+    {
+      "id": "6",
+      "title": "Die Verwandlung",
+      "copyright": 1915,
+      "language": "GERMAN",
+      "pages": 201,
+      "category": "LITERATURE",
+      "authorId": "a6",
+      "publisherId": "p6"
+    },
+    {
+      "id": "7",
+      "title": "Il nome della rosa",
+      "copyright": 1980,
+      "language": "ITALIAN",
+      "pages": 552,
+      "category": "LITERATURE",
+      "authorId": "a7",
+      "publisherId": "p7"
+    },
+    {
+      "id": "8",
+      "title": "Os Lusíadas",
+      "copyright": 1572,
+      "language": "PORTUGUESE",
+      "pages": 881,
+      "category": "LITERATURE",
+      "authorId": "a8",
+      "publisherId": "p8"
+    },
+    {
+      "id": "9",
+      "title": "Love and Friendship",
+      "copyright": 1790,
+      "language": "ENGLISH",
+      "pages": 128,
+      "category": "LITERATURE",
+      "authorId": "a4",
+      "publisherId": "p4"
+    },
+    {
+      "id": "10",
+      "title": "Crónica de una muerte anunciada",
+      "copyright": 1981,
+      "language": "SPANISH",
+      "pages": 128,
+      "category": "LITERATURE",
+      "authorId": "a3",
+      "publisherId": "p3"
+    },
+    {
+      "id": "11",
+      "title": "Sapiens: A Brief History of Humankind",
+      "copyright": 2011,
+      "language": "ENGLISH",
+      "pages": 498,
+      "category": "HISTORY",
+      "authorId": "a9",
+      "publisherId": "p9"
+    },
+    {
+      "id": "12",
+      "title": "Libro de Prueba",
+      "language": "ENGLISH",
+      "pages": 200,
+      "category": "SCIENCE",
+      "authorId": "a1",
+      "publisherId": "p1"
+    }
   ],
   "authors": [
-    { "id": "a1", "name": "Abraham Silberschatz",          "biography": "Computer scientist and professor", "birthYear": 1952, "nationality": "American",    "country": "US", "genre": "SCIENCE" },
-    { "id": "a2", "name": "Andrew S. Tanenbaum",           "biography": "Computer scientist and author",    "birthYear": 1944, "nationality": "Dutch-American","country": "NL", "genre": "SCIENCE" },
-    { "id": "a3", "name": "Gabriel García Márquez",        "biography": "Novelista colombiano, Nobel 1982", "birthYear": 1927, "nationality": "Colombian",   "country": "CO", "genre": "LITERATURE" },
-    { "id": "a4", "name": "Jane Austen",                   "biography": "Novelista inglesa",                "birthYear": 1775, "nationality": "British",     "country": "UK", "genre": "LITERATURE" },
-    { "id": "a5", "name": "Antoine de Saint-Exupéry",      "biography": "Escritor y aviador francés",       "birthYear": 1900, "nationality": "French",      "country": "FR", "genre": "LITERATURE" },
-    { "id": "a6", "name": "Franz Kafka",                   "biography": "Escritor de lengua alemana",       "birthYear": 1883, "nationality": "Austrian",    "country": "AT", "genre": "LITERATURE" },
-    { "id": "a7", "name": "Umberto Eco",                   "biography": "Novelista y semiólogo italiano",   "birthYear": 1932, "nationality": "Italian",     "country": "IT", "genre": "LITERATURE" },
-    { "id": "a8", "name": "Luís de Camões",                "biography": "Poeta portugués",                  "birthYear": 1524, "nationality": "Portuguese",  "country": "PT", "genre": "LITERATURE" },
-    { "id": "a9", "name": "Yuval Noah Harari",             "biography": "Historiador y autor",              "birthYear": 1976, "nationality": "Israeli",     "country": "IL", "genre": "HISTORY" }
+    {
+      "id": "a1",
+      "name": "Abraham Silberschatz",
+      "biography": "Computer scientist and professor",
+      "birthYear": 1952,
+      "nationality": "American",
+      "country": "US",
+      "genre": "SCIENCE"
+    },
+    {
+      "id": "a2",
+      "name": "Andrew S. Tanenbaum",
+      "biography": "Computer scientist and author",
+      "birthYear": 1944,
+      "nationality": "Dutch-American",
+      "country": "NL",
+      "genre": "SCIENCE"
+    },
+    {
+      "id": "a3",
+      "name": "Gabriel García Márquez",
+      "biography": "Novelista colombiano, Nobel 1982",
+      "birthYear": 1927,
+      "nationality": "Colombian",
+      "country": "CO",
+      "genre": "LITERATURE"
+    },
+    {
+      "id": "a4",
+      "name": "Jane Austen",
+      "biography": "Novelista inglesa",
+      "birthYear": 1775,
+      "nationality": "British",
+      "country": "UK",
+      "genre": "LITERATURE"
+    },
+    {
+      "id": "a5",
+      "name": "Antoine de Saint-Exupéry",
+      "biography": "Escritor y aviador francés",
+      "birthYear": 1900,
+      "nationality": "French",
+      "country": "FR",
+      "genre": "LITERATURE"
+    },
+    {
+      "id": "a6",
+      "name": "Franz Kafka",
+      "biography": "Escritor de lengua alemana",
+      "birthYear": 1883,
+      "nationality": "Austrian",
+      "country": "AT",
+      "genre": "LITERATURE"
+    },
+    {
+      "id": "a7",
+      "name": "Umberto Eco",
+      "biography": "Novelista y semiólogo italiano",
+      "birthYear": 1932,
+      "nationality": "Italian",
+      "country": "IT",
+      "genre": "LITERATURE"
+    },
+    {
+      "id": "a8",
+      "name": "Luís de Camões",
+      "biography": "Poeta",
+      "birthYear": 1985,
+      "nationality": "Portuguese",
+      "country": "PT",
+      "genre": "LITERATURE"
+    },
+    {
+      "id": "a9",
+      "name": "Yuval Noah Harari",
+      "biography": "Historiador y autor",
+      "birthYear": 1976,
+      "nationality": "Israeli",
+      "country": "IL",
+      "genre": "HISTORY"
+    },
+    {
+      "id": "a10",
+      "name": "Autor Prueba"
+    }
   ],
   "publishers": [
-    { "id": "p1", "name": "John Wiley & Sons",              "description": "Editorial académica y profesional", "foundedYear": 1807, "country": "US", "headquarters": "Hoboken, NJ", "website": "https://www.wiley.com" },
-    { "id": "p2", "name": "Prentice Hall",                  "description": "Editorial educativa",               "foundedYear": 1913, "country": "US", "headquarters": "New Jersey",  "website": "https://www.pearson.com" },
-    { "id": "p3", "name": "Editorial Sudamericana",         "description": "Editorial latinoamericana",         "foundedYear": 1939, "country": "AR", "headquarters": "Buenos Aires" },
-    { "id": "p4", "name": "T. Egerton",                     "description": "Editorial británica histórica",     "foundedYear": 1784, "country": "UK", "headquarters": "London" },
-    { "id": "p5", "name": "Gallimard",                      "description": "Editorial francesa",               "foundedYear": 1911, "country": "FR", "headquarters": "Paris",       "website": "https://www.gallimard.fr" },
-    { "id": "p6", "name": "Kurt Wolff Verlag",              "description": "Editorial alemana histórica",      "foundedYear": 1913, "country": "DE", "headquarters": "Leipzig" },
-    { "id": "p7", "name": "Bompiani",                       "description": "Editorial italiana",               "foundedYear": 1929, "country": "IT", "headquarters": "Milano" },
-    { "id": "p8", "name": "Regia Officina Typographica",    "description": "Imprenta histórica portuguesa",    "foundedYear": 1572, "country": "PT", "headquarters": "Lisboa" },
-    { "id": "p9", "name": "Harvill Secker",                 "description": "Imprint editorial del Reino Unido","foundedYear": 1910, "country": "UK", "headquarters": "London" }
+    {
+      "id": "p1",
+      "name": "John Wiley & Sons",
+      "description": "Editorial académica y profesional",
+      "foundedYear": 1807,
+      "country": "US",
+      "headquarters": "Hoboken, NJ",
+      "website": "https://www.wiley.com"
+    },
+    {
+      "id": "p2",
+      "name": "Prentice Hall",
+      "description": "Editorial educativa",
+      "foundedYear": 1913,
+      "country": "US",
+      "headquarters": "New Jersey",
+      "website": "https://www.pearson.com"
+    },
+    {
+      "id": "p3",
+      "name": "Editorial Sudamericana",
+      "description": "Editorial latinoamericana",
+      "foundedYear": 1939,
+      "country": "AR",
+      "headquarters": "Buenos Aires"
+    },
+    {
+      "id": "p4",
+      "name": "T. Egerton",
+      "description": "Editorial británica histórica",
+      "foundedYear": 1784,
+      "country": "UK",
+      "headquarters": "London"
+    },
+    {
+      "id": "p5",
+      "name": "Gallimard",
+      "description": "Editorial francesa",
+      "foundedYear": 1911,
+      "country": "FR",
+      "headquarters": "Paris",
+      "website": "https://www.gallimard.fr"
+    },
+    {
+      "id": "p6",
+      "name": "Kurt Wolff Verlag",
+      "description": "Editorial alemana histórica",
+      "foundedYear": 1913,
+      "country": "DE",
+      "headquarters": "Leipzig"
+    },
+    {
+      "id": "p7",
+      "name": "Bompiani",
+      "description": "Editorial italiana",
+      "foundedYear": 1929,
+      "country": "IT",
+      "headquarters": "Milano"
+    },
+    {
+      "id": "p8",
+      "name": "Regia Officina Typographica",
+      "description": "Imprenta histórica portuguesa",
+      "foundedYear": 1572,
+      "country": "PT",
+      "headquarters": "Lisboa"
+    },
+    {
+      "id": "p9",
+      "name": "Harvill Secker",
+      "description": "Imprint editorial del Reino Unido",
+      "foundedYear": 1910,
+      "country": "UK",
+      "headquarters": "London"
+    }
   ]
 }

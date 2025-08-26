@@ -1,11 +1,10 @@
 const fs = require('fs');
 const path = require('path');
-const yaml = require('js-yaml'); // npm i js-yaml
+const yaml = require('js-yaml');
 
 const DB_PATH = path.join(__dirname, 'data.json');
 const OPENAPI_PATH = path.join(__dirname, '..', 'api', 'openapi.yaml');
 
-// === Helpers ===
 const asArray = (v) => (Array.isArray(v) ? v : v != null ? [v] : []);
 const toInt = (v) => (v === '' || v == null || isNaN(v) ? undefined : parseInt(v, 10));
 const dedupeBy = (arr, key) => {
@@ -18,7 +17,6 @@ const dedupeBy = (arr, key) => {
     });
 };
 
-// Normaliza idiomas a tus enums (para que coincidan EXACTO con el combo de Swagger)
 const normalizeLanguageEnum = (val) => {
     if (val == null) return undefined;
     const n = String(val).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
@@ -28,11 +26,9 @@ const normalizeLanguageEnum = (val) => {
     if (['german', 'de', 'aleman'].includes(n)) return 'GERMAN';
     if (['italian', 'it', 'italiano'].includes(n)) return 'ITALIAN';
     if (['portuguese', 'pt', 'portugues'].includes(n)) return 'PORTUGUESE';
-    // Si viene ya como enum u otro valor, lo dejamos en MAYÚSCULAS
     return String(val).toUpperCase();
 };
 
-// Resuelve un example que puede venir como { value }, un $ref, o el valor directo
 function resolveExample(openApiSpec, exNode) {
     if (!exNode) return undefined;
     if (exNode.$ref) {
@@ -43,7 +39,6 @@ function resolveExample(openApiSpec, exNode) {
     return exNode;
 }
 
-// Extrae un arreglo desde /path {method} 200 application/json
 function extractArrayFrom(openApiSpec, route, method = 'get', status = '200', preferName) {
     const content =
         openApiSpec?.paths?.[route]?.[method]?.responses?.[status]?.content?.['application/json'];

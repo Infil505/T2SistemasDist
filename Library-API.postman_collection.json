@@ -1,0 +1,476 @@
+{
+    "info": {
+        "name": "Library API (Books/Authors/Publishers)",
+        "_postman_id": "e3a4e0b2-77fd-4f84-8a4f-4b7f2a6c9a10",
+        "description": "CRUD + relaciones por Id + filtros por language + expand",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:8080"
+        }
+    ],
+    "item": [
+        {
+            "name": "00 - Health & Docs",
+            "item": [
+                {
+                    "name": "GET /  (redirect → /docs)",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('200/302/307/308', function () {",
+                                    "  pm.expect([200,302,307,308]).to.include(pm.response.code);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "GET /docs (Swagger UI)",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/docs"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('200 OK', ()=> pm.response.to.be.ok);"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "01 - Authors",
+            "item": [
+                {
+                    "name": "GET /authors",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/authors"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('200 OK', ()=> pm.response.to.be.ok);",
+                                    "const arr = pm.response.json();",
+                                    "pm.expect(arr).to.be.an('array');",
+                                    "if (arr.length) pm.environment.set('authorId_existing', arr[0].id);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "POST /authors (create a10)",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{baseUrl}}/authors",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"id\": \"a10\",\n  \"name\": \"Autor Prueba\"\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('201 Created', ()=> pm.response.code === 201);",
+                                    "pm.environment.set('authorId_new', pm.response.json().id);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "GET /authors/{id}",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/authors/{{authorId_new}}"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('200 OK', ()=> pm.response.to.be.ok);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PUT /authors/{id}",
+                    "request": {
+                        "method": "PUT",
+                        "url": "{{baseUrl}}/authors/{{authorId_new}}",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{ \"biography\": \"Autor de pruebas para QA\" }"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('200 OK', ()=> pm.response.to.be.ok);"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "02 - Publishers",
+            "item": [
+                {
+                    "name": "GET /publishers",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/publishers"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('200 OK', ()=> pm.response.to.be.ok);",
+                                    "const arr = pm.response.json();",
+                                    "pm.expect(arr).to.be.an('array');",
+                                    "if (arr.length) pm.environment.set('publisherId_existing', arr[0].id);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "POST /publishers (create p10)",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{baseUrl}}/publishers",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{ \"id\": \"p10\", \"name\": \"Editorial Prueba\" }"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('201 Created', ()=> pm.response.code === 201);",
+                                    "pm.environment.set('publisherId_new', pm.response.json().id);"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "03 - Books",
+            "item": [
+                {
+                    "name": "GET /books",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/books"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('200 OK', ()=> pm.response.to.be.ok);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "GET /books?language=SPANISH&expand=author,publisher",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/books?language=SPANISH&expand=author,publisher"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('200 OK', ()=> pm.response.to.be.ok);",
+                                    "const arr = pm.response.json();",
+                                    "pm.expect(arr).to.be.an('array');",
+                                    "arr.forEach(b => pm.expect(b.language).to.eql('SPANISH'));",
+                                    "if (arr.length) { pm.expect(arr[0]).to.have.property('author'); pm.expect(arr[0]).to.have.property('publisher'); }"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "POST /books (create 12)",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{baseUrl}}/books",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"id\": \"12\",\n  \"title\": \"Libro de Prueba\",\n  \"language\": \"ENGLISH\",\n  \"pages\": 200,\n  \"category\": \"SCIENCE\",\n  \"authorId\": \"{{authorId_new}}\",\n  \"publisherId\": \"{{publisherId_new}}\"\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('201 Created', ()=> pm.response.code === 201);",
+                                    "pm.environment.set('bookId_new', pm.response.json().id);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "GET /books/{id}?expand=author,publisher",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/books/{{bookId_new}}?expand=author,publisher"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('200 OK', ()=> pm.response.to.be.ok);",
+                                    "const b = pm.response.json();",
+                                    "pm.expect(b.author?.id).to.eql(pm.environment.get('authorId_new'));",
+                                    "pm.expect(b.publisher?.id).to.eql(pm.environment.get('publisherId_new'));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PUT /books/{id} (update pages)",
+                    "request": {
+                        "method": "PUT",
+                        "url": "{{baseUrl}}/books/{{bookId_new}}",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{ \"pages\": 220 }"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('200 OK', ()=> pm.response.to.be.ok);"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "04 - Deletes & Constraints",
+            "item": [
+                {
+                    "name": "DELETE /authors/{id} (should be 409 while book exists)",
+                    "request": {
+                        "method": "DELETE",
+                        "url": "{{baseUrl}}/authors/{{authorId_new}}"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('409 Conflict', ()=> pm.response.code === 409);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "DELETE /books/{id}",
+                    "request": {
+                        "method": "DELETE",
+                        "url": "{{baseUrl}}/books/{{bookId_new}}"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('204 No Content', ()=> pm.response.code === 204);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "DELETE /authors/{id} (now 204)",
+                    "request": {
+                        "method": "DELETE",
+                        "url": "{{baseUrl}}/authors/{{authorId_new}}"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('204 No Content', ()=> pm.response.code === 204);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "DELETE /publishers/{id} (now 204)",
+                    "request": {
+                        "method": "DELETE",
+                        "url": "{{baseUrl}}/publishers/{{publisherId_new}}"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('204 No Content', ()=> pm.response.code === 204);"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "05 - Negative",
+            "item": [
+                {
+                    "name": "POST /books (author inexistente → 400)",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{baseUrl}}/books",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"id\": \"999\",\n  \"title\": \"Falla por autor\",\n  \"language\": \"ENGLISH\",\n  \"authorId\": \"ZZZ\",\n  \"publisherId\": \"p1\"\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('400 Bad Request', ()=> pm.response.code === 400);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "POST /books (publisher inexistente → 400)",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{baseUrl}}/books",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"id\": \"1000\",\n  \"title\": \"Falla por publisher\",\n  \"language\": \"ENGLISH\",\n  \"authorId\": \"a1\",\n  \"publisherId\": \"ZZZ\"\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('400 Bad Request', ()=> pm.response.code === 400);"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
