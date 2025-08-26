@@ -17,8 +17,6 @@ info:
     url: https://opensource.org/licenses/MIT
 
 servers:
-  - url: http://localhost:8080
-    description: Servidor Local de Desarrollo
   - url: https://t2sistemasdist.onrender.com
     description: Servidor Remoto (Render)
 
