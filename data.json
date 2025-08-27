@@ -163,10 +163,6 @@
       "nationality": "Israeli",
       "country": "IL",
       "genre": "HISTORY"
-    },
-    {
-      "id": "a10",
-      "name": "Autor Prueba"
     }
   ],
   "publishers": [
@@ -244,11 +240,6 @@
       "foundedYear": 1910,
       "country": "UK",
       "headquarters": "London"
-    },
-    {
-      "id": "p10",
-      "name": "Editorial Prueba",
-      "country": "CR"
     }
   ]
 }
