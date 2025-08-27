@@ -17,18 +17,11 @@ const normalizeLanguageEnum = (val) => {
 
 // GET /books
 module.exports.listBooks = (req, res) => {
-    const db = read();
 
-    // Llega tal cual del enum de Swagger (p. ej., "ENGLISH", "SPANISH")
+    const db = read();
     const selected = req.query.language;
     let results = db.books;
-
-    // DEBUG: Agregar logs para ver qué está pasando
-    console.log('=== DEBUG LANGUAGE FILTER ===');
-    console.log('Selected language:', selected);
-    console.log('Total books:', db.books.length);
     
-    // Mostrar los idiomas de todos los libros
     db.books.forEach(book => {
         const raw = book.language ?? book.lang ?? book.idioma;
         const normalized = normalizeLanguageEnum(raw);
@@ -38,7 +31,6 @@ module.exports.listBooks = (req, res) => {
     if (selected && selected !== '--') {
         // Normalizar el idioma seleccionado
         const normalizedSelected = normalizeLanguageEnum(selected);
-        console.log('Normalized selected:', normalizedSelected);
         
         results = results.filter((b) => {
             const raw = b.language ?? b.lang ?? b.idioma;
@@ -97,7 +89,12 @@ module.exports.getBook = (req, res) => {
 // PUT /books/{id}
 module.exports.updateBook = (req, res) => {
     const db = read();
-    const idx = db.books.findIndex(b => b.id === req.params.id);
+    const rawId =
+        req.params?.id ??
+        req.openapi?.pathParams?.id ??
+        req.query?.id;
+        
+    const idx = db.books.findIndex(b => b.id === rawId);
     if (idx === -1) return res.sendStatus(404);
 
     const incoming = req.body;

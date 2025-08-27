@@ -17,7 +17,7 @@ info:
     url: https://opensource.org/licenses/MIT
 
 servers:
-  - url: https://t2sistemasdist.onrender.com/
+  - url: http://localhost:8080
     description: Servidor en linea (producción)
 
 tags:

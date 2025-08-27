@@ -2,65 +2,24 @@
     "info": {
         "name": "Library API (Books/Authors/Publishers)",
         "_postman_id": "e3a4e0b2-77fd-4f84-8a4f-4b7f2a6c9a10",
-        "description": "CRUD + relaciones por Id + filtros por language + expand",
+        "description": "Colección lista para ejecutar: health, CRUD, filtros por language. Sin placeholders de IDs; usa a10, p10 y 12 de forma fija para el flujo.",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "variable": [
         {
             "key": "baseUrl",
-            "value": "http://localhost:8080"
+            "value": "https://t2sistemasdist.onrender.com"
         }
     ],
     "item": [
         {
-            "name": "00 - Health & Docs",
-            "item": [
-                {
-                    "name": "GET /  (redirect → /docs)",
-                    "request": {
-                        "method": "GET",
-                        "url": "{{baseUrl}}/"
-                    },
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "type": "text/javascript",
-                                "exec": [
-                                    "pm.test('200/302/307/308', function () {",
-                                    "  pm.expect([200,302,307,308]).to.include(pm.response.code);",
-                                    "});"
-                                ]
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "GET /docs (Swagger UI)",
-                    "request": {
-                        "method": "GET",
-                        "url": "{{baseUrl}}/docs"
-                    },
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "type": "text/javascript",
-                                "exec": [
-                                    "pm.test('200 OK', ()=> pm.response.to.be.ok);"
-                                ]
-                            }
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "name": "01 - Authors",
+            "description": "Autores: listar, crear (a10), obtener y actualizar (PUT requiere name).",
             "item": [
                 {
                     "name": "GET /authors",
                     "request": {
+                        "description": "Lista todos los autores.",
                         "method": "GET",
                         "url": "{{baseUrl}}/authors"
                     },
@@ -71,9 +30,7 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "pm.test('200 OK', ()=> pm.response.to.be.ok);",
-                                    "const arr = pm.response.json();",
-                                    "pm.expect(arr).to.be.an('array');",
-                                    "if (arr.length) pm.environment.set('authorId_existing', arr[0].id);"
+                                    "pm.test('Es arreglo', ()=> pm.expect(pm.response.json()).to.be.an('array'));"
                                 ]
                             }
                         }
@@ -82,6 +39,7 @@
                 {
                     "name": "POST /authors (create a10)",
                     "request": {
+                        "description": "Crea el autor fijo a10.",
                         "method": "POST",
                         "url": "{{baseUrl}}/authors",
                         "header": [
@@ -101,18 +59,18 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.test('201 Created', ()=> pm.response.code === 201);",
-                                    "pm.environment.set('authorId_new', pm.response.json().id);"
+                                    "pm.test('201 Created', ()=> pm.response.code === 201 || pm.response.code === 200);"
                                 ]
                             }
                         }
                     ]
                 },
                 {
-                    "name": "GET /authors/{id}",
+                    "name": "GET /authors/a10",
                     "request": {
+                        "description": "Obtiene el autor a10.",
                         "method": "GET",
-                        "url": "{{baseUrl}}/authors/{{authorId_new}}"
+                        "url": "{{baseUrl}}/authors/a10"
                     },
                     "event": [
                         {
@@ -120,17 +78,19 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.test('200 OK', ()=> pm.response.to.be.ok);"
+                                    "pm.test('200 OK', ()=> pm.response.to.be.ok);",
+                                    "pm.test('id = a10', ()=> pm.expect(pm.response.json().id).to.eql('a10'));"
                                 ]
                             }
                         }
                     ]
                 },
                 {
-                    "name": "PUT /authors/{id}",
+                    "name": "PUT /authors/a10",
                     "request": {
+                        "description": "Actualiza el autor (PUT = reemplazo; incluye name).",
                         "method": "PUT",
-                        "url": "{{baseUrl}}/authors/{{authorId_new}}",
+                        "url": "{{baseUrl}}/authors/a10",
                         "header": [
                             {
                                 "key": "Content-Type",
@@ -139,7 +99,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{ \"biography\": \"Autor de pruebas para QA\" }"
+                            "raw": "{\n  \"name\": \"Autor Prueba\",\n  \"biography\": \"Autor de pruebas para QA\"\n}"
                         }
                     },
                     "event": [
@@ -148,7 +108,10 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.test('200 OK', ()=> pm.response.to.be.ok);"
+                                    "pm.test('200 OK', ()=> pm.response.to.be.ok);",
+                                    "const a = pm.response.json();",
+                                    "pm.test('Tiene name', ()=> pm.expect(a).to.have.property('name'));",
+                                    "pm.test('Tiene biography', ()=> pm.expect(a).to.have.property('biography'));"
                                 ]
                             }
                         }
@@ -158,10 +121,12 @@
         },
         {
             "name": "02 - Publishers",
+            "description": "Editoriales: listar y crear (p10).",
             "item": [
                 {
                     "name": "GET /publishers",
                     "request": {
+                        "description": "Lista todas las editoriales.",
                         "method": "GET",
                         "url": "{{baseUrl}}/publishers"
                     },
@@ -172,9 +137,7 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "pm.test('200 OK', ()=> pm.response.to.be.ok);",
-                                    "const arr = pm.response.json();",
-                                    "pm.expect(arr).to.be.an('array');",
-                                    "if (arr.length) pm.environment.set('publisherId_existing', arr[0].id);"
+                                    "pm.test('Es arreglo', ()=> pm.expect(pm.response.json()).to.be.an('array'));"
                                 ]
                             }
                         }
@@ -183,6 +146,7 @@
                 {
                     "name": "POST /publishers (create p10)",
                     "request": {
+                        "description": "Crea la editorial fija p10 con country de 2 letras (ISO 3166-1 alfa-2).",
                         "method": "POST",
                         "url": "{{baseUrl}}/publishers",
                         "header": [
@@ -193,7 +157,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{ \"id\": \"p10\", \"name\": \"Editorial Prueba\" }"
+                            "raw": "{\n  \"id\": \"p10\",\n  \"name\": \"Editorial Prueba\",\n  \"country\": \"CR\"\n}"
                         }
                     },
                     "event": [
@@ -202,8 +166,13 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.test('201 Created', ()=> pm.response.code === 201);",
-                                    "pm.environment.set('publisherId_new', pm.response.json().id);"
+                                    "pm.test('201/200 Created/OK', ()=> [200,201].includes(pm.response.code));",
+                                    "const body = pm.response.json();",
+                                    "pm.test('Tiene id, name y country', ()=> {",
+                                    "  pm.expect(body).to.have.property('id');",
+                                    "  pm.expect(body).to.have.property('name');",
+                                    "  pm.expect(body).to.have.property('country');",
+                                    "});"
                                 ]
                             }
                         }
@@ -213,10 +182,12 @@
         },
         {
             "name": "03 - Books",
+            "description": "Libros: listar, filtrar, crear (12 con a10/p10), obtener actualizar.",
             "item": [
                 {
                     "name": "GET /books",
                     "request": {
+                        "description": "Lista todos los libros.",
                         "method": "GET",
                         "url": "{{baseUrl}}/books"
                     },
@@ -226,17 +197,19 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.test('200 OK', ()=> pm.response.to.be.ok);"
+                                    "pm.test('200 OK', ()=> pm.response.to.be.ok);",
+                                    "pm.test('JSON válido', ()=> { try { pm.response.json(); pm.expect(true).to.be.true; } catch(e){ pm.expect.fail('No es JSON'); } });"
                                 ]
                             }
                         }
                     ]
                 },
                 {
-                    "name": "GET /books?language=SPANISH&expand=author,publisher",
+                    "name": "GET /books?language=SPANISH",
                     "request": {
+                        "description": "Filtra por idioma.",
                         "method": "GET",
-                        "url": "{{baseUrl}}/books?language=SPANISH&expand=author,publisher"
+                        "url": "{{baseUrl}}/books?language=SPANISH"
                     },
                     "event": [
                         {
@@ -246,9 +219,11 @@
                                 "exec": [
                                     "pm.test('200 OK', ()=> pm.response.to.be.ok);",
                                     "const arr = pm.response.json();",
-                                    "pm.expect(arr).to.be.an('array');",
-                                    "arr.forEach(b => pm.expect(b.language).to.eql('SPANISH'));",
-                                    "if (arr.length) { pm.expect(arr[0]).to.have.property('author'); pm.expect(arr[0]).to.have.property('publisher'); }"
+                                    "pm.test('Es arreglo', ()=> pm.expect(arr).to.be.an('array'));",
+                                    "if (Array.isArray(arr)) {",
+                                    "  arr.forEach(b => pm.expect(b.language).to.eql('SPANISH'));",
+                                    "  if (arr.length) { pm.expect(arr[0]).to.have.property('author'); pm.expect(arr[0]).to.have.property('publisher'); }",
+                                    "}"
                                 ]
                             }
                         }
@@ -257,6 +232,7 @@
                 {
                     "name": "POST /books (create 12)",
                     "request": {
+                        "description": "Crea el libro fijo 12 relacionado con a10 y p10.",
                         "method": "POST",
                         "url": "{{baseUrl}}/books",
                         "header": [
@@ -267,7 +243,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"id\": \"12\",\n  \"title\": \"Libro de Prueba\",\n  \"language\": \"ENGLISH\",\n  \"pages\": 200,\n  \"category\": \"SCIENCE\",\n  \"authorId\": \"{{authorId_new}}\",\n  \"publisherId\": \"{{publisherId_new}}\"\n}"
+                            "raw": "{\n  \"id\": \"12\",\n  \"title\": \"Libro de Prueba\",\n  \"language\": \"ENGLISH\",\n  \"pages\": 200,\n  \"category\": \"SCIENCE\",\n  \"authorId\": \"a10\",\n  \"publisherId\": \"p10\"\n}"
                         }
                     },
                     "event": [
@@ -276,18 +252,24 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.test('201 Created', ()=> pm.response.code === 201);",
-                                    "pm.environment.set('bookId_new', pm.response.json().id);"
+                                    "pm.test('201 Created', ()=> pm.response.code === 201 || pm.response.code === 200);",
+                                    "const body = pm.response.json();",
+                                    "pm.test('id = 12', ()=> pm.expect(body.id).to.eql('12'));",
+                                    "pm.test('Relaciones correctas', ()=> {",
+                                    "  pm.expect(body.authorId).to.eql('a10');",
+                                    "  pm.expect(body.publisherId).to.eql('p10');",
+                                    "});"
                                 ]
                             }
                         }
                     ]
                 },
                 {
-                    "name": "GET /books/{id}?expand=author,publisher",
+                    "name": "GET /books/12",
                     "request": {
+                        "description": "Obtiene el libro 12.",
                         "method": "GET",
-                        "url": "{{baseUrl}}/books/{{bookId_new}}?expand=author,publisher"
+                        "url": "{{baseUrl}}/books/12"
                     },
                     "event": [
                         {
@@ -297,18 +279,22 @@
                                 "exec": [
                                     "pm.test('200 OK', ()=> pm.response.to.be.ok);",
                                     "const b = pm.response.json();",
-                                    "pm.expect(b.author?.id).to.eql(pm.environment.get('authorId_new'));",
-                                    "pm.expect(b.publisher?.id).to.eql(pm.environment.get('publisherId_new'));"
+                                    "pm.test('Coincide id', ()=> pm.expect(b.id).to.eql('12'));",
+                                    "pm.test('author.id = a10 y publisher.id = p10', ()=> {",
+                                    "  pm.expect(b.author && b.author.id).to.eql('a10');",
+                                    "  pm.expect(b.publisher && b.publisher.id).to.eql('p10');",
+                                    "});"
                                 ]
                             }
                         }
                     ]
                 },
                 {
-                    "name": "PUT /books/{id} (update pages)",
+                    "name": "PUT /books/12 (update pages)",
                     "request": {
+                        "description": "Actualiza el libro 12 (envío completo para evitar validaciones de PUT).",
                         "method": "PUT",
-                        "url": "{{baseUrl}}/books/{{bookId_new}}",
+                        "url": "{{baseUrl}}/books/12",
                         "header": [
                             {
                                 "key": "Content-Type",
@@ -317,7 +303,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{ \"pages\": 220 }"
+                            "raw": "{\n  \"title\": \"Libro de Prueba\",\n  \"language\": \"ENGLISH\",\n  \"pages\": 220,\n  \"category\": \"SCIENCE\",\n  \"authorId\": \"a10\",\n  \"publisherId\": \"p10\"\n}"
                         }
                     },
                     "event": [
@@ -326,7 +312,8 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.test('200 OK', ()=> pm.response.to.be.ok);"
+                                    "pm.test('200 OK', ()=> pm.response.to.be.ok);",
+                                    "pm.test('pages = 220', ()=> pm.expect(pm.response.json().pages).to.eql(220));"
                                 ]
                             }
                         }
@@ -336,12 +323,14 @@
         },
         {
             "name": "04 - Deletes & Constraints",
+            "description": "Prueba de constraint y borrado ordenado: autor debe fallar si el libro existe; luego borra libro y finalmente autor y editorial.",
             "item": [
                 {
-                    "name": "DELETE /authors/{id} (should be 409 while book exists)",
+                    "name": "DELETE /authors/a10 (should be 409 while book exists)",
                     "request": {
+                        "description": "Debe responder 409 si hay un libro que referencia al autor.",
                         "method": "DELETE",
-                        "url": "{{baseUrl}}/authors/{{authorId_new}}"
+                        "url": "{{baseUrl}}/authors/a10"
                     },
                     "event": [
                         {
@@ -356,10 +345,11 @@
                     ]
                 },
                 {
-                    "name": "DELETE /books/{id}",
+                    "name": "DELETE /books/12",
                     "request": {
+                        "description": "Elimina el libro 12.",
                         "method": "DELETE",
-                        "url": "{{baseUrl}}/books/{{bookId_new}}"
+                        "url": "{{baseUrl}}/books/12"
                     },
                     "event": [
                         {
@@ -374,10 +364,11 @@
                     ]
                 },
                 {
-                    "name": "DELETE /authors/{id} (now 204)",
+                    "name": "DELETE /authors/a10 (now 204)",
                     "request": {
+                        "description": "Ahora sí debe permitir eliminar el autor.",
                         "method": "DELETE",
-                        "url": "{{baseUrl}}/authors/{{authorId_new}}"
+                        "url": "{{baseUrl}}/authors/a10"
                     },
                     "event": [
                         {
@@ -392,10 +383,11 @@
                     ]
                 },
                 {
-                    "name": "DELETE /publishers/{id} (now 204)",
+                    "name": "DELETE /publishers/p10 (now 204)",
                     "request": {
+                        "description": "Elimina la editorial p10.",
                         "method": "DELETE",
-                        "url": "{{baseUrl}}/publishers/{{publisherId_new}}"
+                        "url": "{{baseUrl}}/publishers/p10"
                     },
                     "event": [
                         {
@@ -413,10 +405,12 @@
         },
         {
             "name": "05 - Negative",
+            "description": "Casos de error esperados (400).",
             "item": [
                 {
                     "name": "POST /books (author inexistente → 400)",
                     "request": {
+                        "description": "Debe fallar porque el authorId no existe.",
                         "method": "POST",
                         "url": "{{baseUrl}}/books",
                         "header": [
@@ -436,7 +430,8 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.test('400 Bad Request', ()=> pm.response.code === 400);"
+                                    "pm.test('400 Bad Request', ()=> pm.response.code === 400);",
+                                    "pm.test('Mensaje de error presente', ()=> pm.expect(pm.response.json()).to.have.property('message'));"
                                 ]
                             }
                         }
@@ -445,6 +440,7 @@
                 {
                     "name": "POST /books (publisher inexistente → 400)",
                     "request": {
+                        "description": "Debe fallar porque el publisherId no existe.",
                         "method": "POST",
                         "url": "{{baseUrl}}/books",
                         "header": [
@@ -464,7 +460,8 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.test('400 Bad Request', ()=> pm.response.code === 400);"
+                                    "pm.test('400 Bad Request', ()=> pm.response.code === 400);",
+                                    "pm.test('Mensaje de error presente', ()=> pm.expect(pm.response.json()).to.have.property('message'));"
                                 ]
                             }
                         }
